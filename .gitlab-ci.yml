@@ -1,89 +1,158 @@
-image: python:3.10
+# Use Python 3.10 slim image for smaller size and faster downloads
+image: python:3.10-slim
 
-# Cache Python dependencies
-cache:
-  paths:
-    - .cache/pip
-    - venv/
-
-# Define stages
+# Define pipeline stages
 stages:
   - test
   - build
   - deploy
 
-# Variables
+# Global variables
 variables:
+  # Cache configuration
   PIP_CACHE_DIR: "${CI_PROJECT_DIR}/.cache/pip"
   VENV_PATH: "${CI_PROJECT_DIR}/venv"
   COMPOSIO_CACHE_DIR: "${CI_PROJECT_DIR}/.composio"
+  
+  # Python settings
+  PYTHON_VERSION: "3.10"
+  
+  # Disable pip version check for faster execution
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  PIP_NO_PYTHON_VERSION_WARNING: "1"
+  PYTHONUNBUFFERED: "1"
 
-# Before script - runs before each job
-before_script:
+# Cache configuration
+cache:
+  key: "${CI_COMMIT_REF_SLUG}"
+  paths:
+    - ${PIP_CACHE_DIR}
+    - ${VENV_PATH}
+    - .mypy_cache/
+  policy: pull-push
+
+# Default before_script for all jobs
+.before_script: &before_script
   - python --version
-  - pip install virtualenv
-  - virtualenv $VENV_PATH
-  - source $VENV_PATH/bin/activate
   - pip install --upgrade pip setuptools wheel
+  - python -m venv ${VENV_PATH}
+  - source ${VENV_PATH}/bin/activate
   - pip install -r requirements.txt
   - pip install -e .
-  - mkdir -p $COMPOSIO_CACHE_DIR
+  - mkdir -p ${COMPOSIO_CACHE_DIR}
 
 # Linting job
 lint:
   stage: test
+  before_script:
+    - *before_script
+    - pip install black==23.7.0 flake8==6.1.0 mypy==1.5.1
   script:
-    - pip install black flake8 mypy
+    - echo "Running black..."
     - black --check --diff .
+    - echo "Running flake8..."
     - flake8 .
+    - echo "Running mypy..."
     - mypy .
+  artifacts:
+    when: on_failure
+    paths:
+      - ${COMPOSIO_CACHE_DIR}/
+    expire_in: 1 week
+  cache:
+    key: "${CI_COMMIT_REF_SLUG}-lint"
+    paths:
+      - ${PIP_CACHE_DIR}
+      - ${VENV_PATH}
+      - .mypy_cache/
+    policy: pull-push
 
 # Testing job
 test:
   stage: test
+  before_script:
+    - *before_script
+    - pip install pytest==7.4.0 pytest-cov==4.1.0
   script:
-    - pip install pytest pytest-cov
-    - pytest --cov=./ --cov-report=xml
+    - echo "Running tests with coverage..."
+    - pytest --cov=./ --cov-report=xml --cov-report=term-missing
+  coverage: '/^TOTAL.*\s+(\d+\%)$/'
   artifacts:
     reports:
       coverage_report:
         coverage_format: cobertura
         path: coverage.xml
-  coverage: '/^TOTAL.*\s+(\d+\%)$/'  # Adjust the regex based on your coverage output
+    paths:
+      - coverage.xml
+      - .coverage
+    expire_in: 1 week
+  cache:
+    key: "${CI_COMMIT_REF_SLUG}-test"
+    paths:
+      - ${PIP_CACHE_DIR}
+      - ${VENV_PATH}
+      - .pytest_cache/
+    policy: pull-push
 
 # Build job
 build:
   stage: build
+  before_script:
+    - *before_script
+    - pip install build==0.10.0
   script:
-    - echo "Building the application..."
-    - python setup.py sdist bdist_wheel
+    - echo "Building Python package..."
+    - python -m build --sdist --wheel --outdir dist/ .
   artifacts:
     paths:
-      - dist/
+      - dist/*
     expire_in: 1 week
+  only:
+    - main
+    - merge_requests
+    - tags
 
-# Deploy job (example - customize based on your deployment needs)
+# Deploy to staging
 deploy_staging:
   stage: deploy
+  before_script:
+    - *before_script
   script:
     - echo "Deploying to staging environment..."
-    # Add your deployment commands here
-    # Example: scp -r dist/ user@staging-server:/path/to/deploy
+    # Example: twine upload --repository-url ${STAGING_PYPI_URL} -u ${STAGING_PYPI_USER} -p ${STAGING_PYPI_PASSWORD} dist/*
+    - echo "Deployment to staging completed successfully"
   environment:
     name: staging
     url: https://staging.example.com  # Update with your staging URL
   only:
     - main  # Only deploy when changes are pushed to main branch
+  cache: {}
+  dependencies:
+    - build
 
-# Deploy to production (example - customize as needed)
+# Deploy to production
 deploy_prod:
   stage: deploy
+  before_script:
+    - *before_script
   script:
     - echo "Deploying to production..."
-    # Add your production deployment commands here
+    # Example: twine upload -u ${PYPI_USER} -p ${PYPI_PASSWORD} dist/*
+    - echo "Production deployment completed successfully"
   environment:
     name: production
     url: https://example.com  # Update with your production URL
   when: manual  # Requires manual approval in GitLab UI
   only:
     - tags  # Only deploy when a new tag is created
+  cache: {}
+  dependencies:
+    - build
+
+# Workflow rules to control pipeline behavior
+workflow:
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_BRANCH =~ /^feature\/.*/ && $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH =~ /^release\/.*/
