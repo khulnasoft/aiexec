@@ -177,11 +177,11 @@ export default function UpdateComponentModal({
                   className="ag-tool-mode ag-no-selection"
                   rowHeight={30}
                   headerHeight={30}
-                  rowSelection={{ 
+                  rowSelection={{
                     mode: "multiRow",
                     enableClickSelection: true,
                     checkboxes: true,
-                    headerCheckbox: true
+                    headerCheckbox: true,
                   }}
                   onSelectionChanged={(event) => {
                     const selectedIds = event.api

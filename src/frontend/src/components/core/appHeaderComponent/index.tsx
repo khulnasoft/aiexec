@@ -69,10 +69,10 @@ export default function AppHeader(): JSX.Element {
           {ENABLE_DATASTAX_AIEXEC ? (
             <DataStaxLogo className="fill-black dark:fill-[white]" />
           ) : (
-            <img 
-              src={aiexecHeaderLogo} 
-              alt="Aiexec Logo" 
-              className="h-8 w-auto" 
+            <img
+              src={aiexecHeaderLogo}
+              alt="Aiexec Logo"
+              className="h-8 w-auto"
             />
           )}
         </Button>
@@ -132,9 +132,7 @@ export default function AppHeader(): JSX.Element {
                   }`}
                   strokeWidth={2}
                 />
-                <span className="hidden whitespace-nowrap">
-                  Notifications
-                </span>
+                <span className="hidden whitespace-nowrap">Notifications</span>
               </div>
             </Button>
           </ShadTooltip>

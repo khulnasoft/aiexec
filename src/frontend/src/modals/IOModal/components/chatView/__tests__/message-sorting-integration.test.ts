@@ -275,12 +275,12 @@ describe("Message Sorting Integration", () => {
         // Actual measurement with multiple runs for better accuracy
         const runs = 3;
         let totalTime = 0;
-        
+
         for (let run = 0; run < runs; run++) {
           const startTime = performance.now();
           [...transformed].sort(sortSenderMessages);
           const endTime = performance.now();
-          totalTime += (endTime - startTime);
+          totalTime += endTime - startTime;
         }
 
         timings.push(totalTime / runs); // Average time
@@ -290,7 +290,7 @@ describe("Message Sorting Integration", () => {
       // Focus on preventing exponential behavior rather than strict O(n log n)
       expect(timings[1]).toBeLessThan(timings[0] * 50); // 4x size, <50x time (very lenient)
       expect(timings[2]).toBeLessThan(timings[1] * 50); // 2.5x size, <50x time (very lenient)
-      
+
       // Main goal: ensure it's not exponential (O(n²) would be much worse)
       expect(timings[2]).toBeLessThan(timings[0] * 500); // 10x size should not be 500x+ slower
     });

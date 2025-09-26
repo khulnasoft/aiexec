@@ -97,12 +97,12 @@ export default function ApiKeysPage() {
           onSelectionChanged={(event: SelectionChangedEvent) => {
             setSelectedRows(event.api.getSelectedRows().map((row) => row.id));
           }}
-          rowSelection={{ 
+          rowSelection={{
             mode: "multiRow",
             enableClickSelection: false,
             checkboxes: true,
             headerCheckbox: true,
-            hideDisabledCheckboxes: false
+            hideDisabledCheckboxes: false,
           }}
           pagination={true}
           columnDefs={columnDefs}
