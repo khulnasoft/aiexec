@@ -1,6 +1,6 @@
-# Running LangFlow with Docker
+# Running AiExec with Docker
 
-This guide will help you get LangFlow up and running using Docker and Docker Compose.
+This guide will help you get AiExec up and running using Docker and Docker Compose.
 
 ## Prerequisites
 
@@ -9,7 +9,7 @@ This guide will help you get LangFlow up and running using Docker and Docker Com
 
 ## Steps
 
-1. Clone the LangFlow repository:
+1. Clone the AiExec repository:
 
    ```sh
    git clone https://github.com/khulnasoft/aiexec.git
@@ -27,20 +27,20 @@ This guide will help you get LangFlow up and running using Docker and Docker Com
    docker compose up
    ```
 
-LangFlow will now be accessible at [http://localhost:7860/](http://localhost:7860/).
+AiExec will now be accessible at [http://localhost:7860/](http://localhost:7860/).
 
 ## Docker Compose Configuration
 
 The Docker Compose configuration spins up two services: `aiexec` and `postgres`.
 
-### LangFlow Service
+### AiExec Service
 
 The `aiexec` service uses the `khulnasoft/aiexec:latest` Docker image and exposes port 7860. It depends on the `postgres` service.
 
 Environment variables:
 
 - `AIEXEC_DATABASE_URL`: The connection string for the PostgreSQL database.
-- `AIEXEC_CONFIG_DIR`: The directory where LangFlow stores logs, file storage, monitor data, and secret keys.
+- `AIEXEC_CONFIG_DIR`: The directory where AiExec stores logs, file storage, monitor data, and secret keys.
 
 Volumes:
 
@@ -60,6 +60,6 @@ Volumes:
 
 - `aiexec-postgres`: This volume is mapped to `/var/lib/postgresql/data` in the container.
 
-## Switching to a Specific LangFlow Version
+## Switching to a Specific AiExec Version
 
-If you want to use a specific version of LangFlow, you can modify the `image` field under the `aiexec` service in the Docker Compose file. For example, to use version 1.0-alpha, change `khulnasoft/aiexec:latest` to `khulnasoft/aiexec:1.0-alpha`.
+If you want to use a specific version of AiExec, you can modify the `image` field under the `aiexec` service in the Docker Compose file. For example, to use version 1.0-alpha, change `khulnasoft/aiexec:latest` to `khulnasoft/aiexec:1.0-alpha`.
