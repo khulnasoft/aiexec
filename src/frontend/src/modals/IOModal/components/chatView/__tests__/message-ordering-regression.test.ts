@@ -450,12 +450,12 @@ describe("Message Ordering Regression Tests - GitHub Issue #9186", () => {
         // Actual measurement with multiple runs for better accuracy
         const runs = 3;
         let totalTime = 0;
-        
+
         for (let run = 0; run < runs; run++) {
           const startTime = performance.now();
           [...messages].sort(sortSenderMessages);
           const endTime = performance.now();
-          totalTime += (endTime - startTime);
+          totalTime += endTime - startTime;
         }
 
         timings.push(totalTime / runs); // Average time
@@ -466,7 +466,7 @@ describe("Message Ordering Regression Tests - GitHub Issue #9186", () => {
       // O(n log n) means 10x data should be ~33x slower, but we allow more margin for test variability
       expect(timings[1]).toBeLessThan(timings[0] * 100); // 100 items vs 10 items - more lenient
       expect(timings[2]).toBeLessThan(timings[1] * 100); // 1000 items vs 100 items - more lenient
-      
+
       // Also check that it's not exponential (O(n²) would be 100x slower for 10x data)
       expect(timings[2]).toBeLessThan(timings[0] * 1000); // 1000 vs 10 items should not be 1000x+ slower
     });

@@ -133,9 +133,9 @@ export default function GlobalVariablesPage() {
           onSelectionChanged={(event: SelectionChangedEvent) => {
             setSelectedRows(event.api.getSelectedRows().map((row) => row.name));
           }}
-          rowSelection={{ 
+          rowSelection={{
             mode: "multiRow",
-            enableClickSelection: false
+            enableClickSelection: false,
           }}
           onRowClicked={updateVariables}
           pagination={true}
