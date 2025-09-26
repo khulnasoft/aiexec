@@ -272,10 +272,14 @@ export default function TableNodeComponent({
           onSelectionChanged={(event: SelectionChangedEvent) => {
             setSelectedNodes(event.api.getSelectedNodes());
           }}
-          rowSelection={table_options?.block_select ? undefined : { 
-            mode: "multiRow",
-            enableClickSelection: false
-          }}
+          rowSelection={
+            table_options?.block_select
+              ? undefined
+              : {
+                  mode: "multiRow",
+                  enableClickSelection: false,
+                }
+          }
           editable={editable}
           pagination={!table_options?.hide_options}
           addRow={addRow}

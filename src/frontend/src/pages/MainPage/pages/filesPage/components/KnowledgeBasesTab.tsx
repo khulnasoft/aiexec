@@ -200,11 +200,11 @@ const KnowledgeBasesTab = ({
             tableOptions={{
               hide_options: true,
             }}
-            rowSelection={{ 
+            rowSelection={{
               mode: "multiRow",
               enableClickSelection: isShiftPressed,
               checkboxes: true,
-              headerCheckbox: true
+              headerCheckbox: true,
             }}
             onSelectionChanged={handleSelectionChange}
             onRowClicked={handleRowClick}

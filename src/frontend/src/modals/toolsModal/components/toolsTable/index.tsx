@@ -294,9 +294,9 @@ export default function ToolsTable({
             rowData={data}
             quickFilterText={searchQuery}
             ref={agGrid}
-            rowSelection={{ 
+            rowSelection={{
               mode: "multiRow",
-              enableClickSelection: false
+              enableClickSelection: false,
             }}
             className="ag-tool-mode h-full w-full overflow-visible"
             headerHeight={32}
